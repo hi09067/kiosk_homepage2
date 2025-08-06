@@ -113,7 +113,7 @@ export default function SurveyScreen({ navigation }) {
       }
 
     } catch (error) {
-      if (error.response?.status === 409) {
+      if (httpStatus === 'CONFLICT') {
         Toast.show({
           type: 'info',
           text1: '중복 제출',
