@@ -21,7 +21,7 @@ export default function RoleCheckScreen({ navigation }) {
 
       if (role) {
         setRole(role);
-        setStatusMessage("🎭 "+nickName+"님의 역할은 <"+role+">입니다!");
+        setStatusMessage("🎭 ["+nickName+"]님의 역할은 ["+role+"]입니다!");
       } else {
         setStatusMessage('직업 배정중입니다. 조금만 기다려주세요.');
       }

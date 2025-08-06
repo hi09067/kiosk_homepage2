@@ -94,20 +94,40 @@ export default function SurveyScreen({ navigation }) {
         answerC: totals['c'],
       });
 
-      const res = response.data; // 전체 ResponseDTO
-      const isSuccess = res?.resData === true; // 성공 여부 판단
+      const { httpStatus, message, alertType, resData } = response.data;
 
-      if (response.status === 200 && isSuccess) {
-        Alert.alert('제출 완료', '설문이 성공적으로 제출되었습니다.');
+      if (httpStatus === 'OK' && resData === true) {
+        Toast.show({
+          type: 'success',
+          text1: '제출 완료',
+          text2: '설문이 성공적으로 제출되었습니다.',
+        });
         navigation.navigate('Final');
       } else {
-        const msg = res?.message || '서버 오류';
-        throw new Error(msg);
+        Toast.show({
+          type: alertType,
+          text1: '제출 실패',
+          text2: message || '문제가 발생했습니다.',
+        });
       }
+
     } catch (error) {
-      console.error(error);
-      Alert.alert('에러', '설문 제출 중 문제가 발생했습니다.');
+      if (error.response?.status === 409) {
+        Toast.show({
+          type: 'info',
+          text1: '중복 제출',
+          text2: '이미 설문에 응답했습니다. 다음 페이지로 이동합니다.',
+        });
+        navigation.navigate('Final');
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: '서버 오류',
+          text2: '서버에 연결할 수 없습니다.',
+        });
+      }
     }
+
 
   };
 

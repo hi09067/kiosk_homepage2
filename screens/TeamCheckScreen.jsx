@@ -30,7 +30,7 @@ export default function TeamCheckScreen({ navigation }) {
       console.log('team:', team);
 
       if (typeof team === 'string' && team.trim() !== '') {
-        setStatusMessage(`${nickName}님은 ${team}팀에 배정되었습니다.`);
+        setStatusMessage(`[${nickName}]님은 [${team}]팀에 배정되었습니다.`);
       } else {
         setStatusMessage('팀 배정중입니다. 조금만 기다려주세요!');
       }
