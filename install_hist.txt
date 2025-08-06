@@ -1,0 +1,13 @@
+2025-08-05 김은서
+- npx expo install react-dom react-native-web @expo/metro-runtime   => 웹에서의 실행을 위해 설치
+
+- npx expo install @react-navigation/native
+
+- npx expo install react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-reanimated => 추가 의존성도 함께 설치
+
+- npx expo install @react-navigation/native-stack =>  stack navigator를 위한 패키지도 설치
+
+-npm install zustand  => useUserStore 사용을 위해 설치
+
+-npm install react-native-dotenv => .env 사용을 위해 설치
+-npm install axios  => axios 사용을 위해 설치
