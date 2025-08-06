@@ -20,16 +20,17 @@ export default function TeamCheckScreen({ navigation }) {
     setLoading(true);
     try {
       const response = await axios.get(`${BACK_SERVER}/getTeam/${nickName}`);
-      const receiptInfo = response.data?.resData;
+
+      const res = response.data; // 전체 ResponseDTO
+      const receiptInfo = res?.resData;
       const team = receiptInfo?.team;
 
       console.log('📍 TeamCheckScreen 실행');
       console.log('receiptInfo:', receiptInfo);
       console.log('team:', team);
-      console.log("✅ 조건 만족, 메시지 설정 전");
 
       if (typeof team === 'string' && team.trim() !== '') {
-        setStatusMessage(nickName+"님은 "+team+"팀에 배정되었습니다.");
+        setStatusMessage(`${nickName}님은 ${team}팀에 배정되었습니다.`);
       } else {
         setStatusMessage('팀 배정중입니다. 조금만 기다려주세요!');
       }
@@ -39,6 +40,7 @@ export default function TeamCheckScreen({ navigation }) {
     } finally {
       setLoading(false);
     }
+
   };
 
   const handleConfirm = () => {

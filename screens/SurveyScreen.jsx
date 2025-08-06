@@ -94,16 +94,21 @@ export default function SurveyScreen({ navigation }) {
         answerC: totals['c'],
       });
 
-      if (response.status === 200) {
+      const res = response.data; // 전체 ResponseDTO
+      const isSuccess = res?.resData === true; // 성공 여부 판단
+
+      if (response.status === 200 && isSuccess) {
         Alert.alert('제출 완료', '설문이 성공적으로 제출되었습니다.');
         navigation.navigate('Final');
       } else {
-        throw new Error('서버 오류');
+        const msg = res?.message || '서버 오류';
+        throw new Error(msg);
       }
     } catch (error) {
       console.error(error);
       Alert.alert('에러', '설문 제출 중 문제가 발생했습니다.');
     }
+
   };
 
   return (
