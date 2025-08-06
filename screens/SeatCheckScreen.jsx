@@ -15,28 +15,32 @@ export default function SeatCheckScreen() {
   const url = `${BACK_SERVER}/chkMemberSeat/${encodedNickName}`;
 
   const fetchSeatNumber = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(url, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+  setLoading(true);
+  try {
+    const response = await axios.get(url, {
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-      const isAssigned = response.data.resData; // 숫자 or 0
-      console.log('서버 응답 seat:', isAssigned);
+    // 구조 분해 할당
+    const { httpStatus, resData, message, alertType } = response.data;
 
-      if (isAssigned > 0) {
-        setSeatNumber(isAssigned);
-      } else {
-        Alert.alert('자리 배치 미완료', '아직 자리 배치가 완료되지 않았어요.');
-        setSeatNumber(null); // 명확히 처리
-      }
-    } catch (error) {
-      console.error('자리 확인 중 오류 발생:', error);
-      Alert.alert('오류', '서버와의 연결에 실패했습니다.');
-    } finally {
-      setLoading(false);
+    if (httpStatus === 'OK' && resData > 0) {
+      setSeatNumber(resData);
+    } else if (httpStatus === 'OK' && resData === 0) {
+      Alert.alert('자리 배치 미완료', '아직 자리 배치가 완료되지 않았어요.');
+      setSeatNumber(null);
+    } else {
+      Alert.alert('오류', message || '예상치 못한 응답입니다.');
     }
-  };
+
+  } catch (error) {
+    console.error('자리 확인 중 오류 발생:', error);
+    Alert.alert('오류', '서버와의 연결에 실패했습니다.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleNext = () => {
     if (seatNumber === null) {
