@@ -12,6 +12,7 @@ export default function LoginScreen() {
   const { setNickName, setMemberId } = useUserStore();
   const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
   const url = `${BACK_SERVER}/isDuplicateNickname`;
+  console.log(url);
 
   // 임시 handleSubmit (로컬 test용)
   const handleSubmit = async () => {
