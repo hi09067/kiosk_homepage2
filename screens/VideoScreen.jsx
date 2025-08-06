@@ -1,3 +1,5 @@
+import { StyleSheet, View } from 'react-native';
+
 export default function VideoScreen({ navigation }) {
   const handleNext = () => {
     navigation.navigate('SeatCheck');
@@ -37,8 +39,6 @@ export default function VideoScreen({ navigation }) {
   );
 }
 
-import { StyleSheet } from 'react-native';
-import { View } from 'react-native-reanimated/lib/typescript/Animated';
 
 const styles = StyleSheet.create({
   container: {
