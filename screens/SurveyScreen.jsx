@@ -89,7 +89,7 @@ export default function SurveyScreen({ navigation }) {
 
     try {
       const response = await axios.post(`${BACK_SERVER}/submitSurvey`, {
-        nickName: nickName,
+        nickName,
         answerA: totals['a'],
         answerB: totals['b'],
         answerC: totals['c'],
@@ -98,29 +98,21 @@ export default function SurveyScreen({ navigation }) {
       const { httpStatus, message, alertType, resData } = response.data;
 
       if (httpStatus === 'OK' && resData === true) {
-        Toast.show({
-          type: 'success',
-          text1: '제출 완료',
-          text2: '설문이 성공적으로 제출되었습니다.',
-        });
+        Toast.show({ type: 'success', text1: '제출 완료', text2: message });
         navigation.navigate('Final');
       } else {
-        Toast.show({
-          type: alertType,
-          text1: '제출 실패',
-          text2: message || '문제가 발생했습니다.',
-        });
+        Toast.show({ type: alertType, text1: '실패', text2: message });
       }
 
-    } 
-    catch (error) {
-      const { httpStatus} = response.data;
+    } catch (error) {
+      const status = error.response?.status;
+      const { httpStatus, message, alertType } = error.response?.data || {};
 
-      if (httpStatus === 'CONFLICT') {
+      if (status === 409) {
         Toast.show({
-          type: 'info',
+          type: alertType || 'info',
           text1: '중복 제출',
-          text2: '이미 설문에 응답했습니다. 다음 페이지로 이동합니다.',
+          text2: message || '이미 설문을 제출하셨습니다. 다음 페이지로 이동합니다.',
         });
         navigation.navigate('Final');
       } else {
@@ -131,7 +123,6 @@ export default function SurveyScreen({ navigation }) {
         });
       }
     }
-
 
   };
 
