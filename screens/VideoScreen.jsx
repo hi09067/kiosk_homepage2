@@ -38,6 +38,7 @@ export default function VideoScreen({ navigation }) {
 }
 
 import { StyleSheet } from 'react-native';
+import { View } from 'react-native-reanimated/lib/typescript/Animated';
 
 const styles = StyleSheet.create({
   container: {
