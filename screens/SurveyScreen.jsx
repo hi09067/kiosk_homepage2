@@ -112,7 +112,10 @@ export default function SurveyScreen({ navigation }) {
         });
       }
 
-    } catch (error) {
+    } 
+    catch (error) {
+      const { httpStatus} = response.data;
+
       if (httpStatus === 'CONFLICT') {
         Toast.show({
           type: 'info',
