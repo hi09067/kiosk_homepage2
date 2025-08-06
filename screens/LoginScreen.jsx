@@ -3,18 +3,18 @@ import axios from 'axios';
 import { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message'; // 👈 Toast import 추가
 import useUserStore from '../store/useUserStore';
 
 export default function LoginScreen() {
   const [nickname, setNickname] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // 👈 로딩 상태 추가
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const { setNickName, setMemberId } = useUserStore();
   const BACK_SERVER = "https://b99d987b875f.ngrok.app";
@@ -23,11 +23,15 @@ export default function LoginScreen() {
   const handleSubmit = async () => {
     const trimmed = nickname.trim();
     if (!trimmed) {
-      Alert.alert('입력 오류', '닉네임을 입력해주세요!');
+      Toast.show({
+        type: 'error',
+        text1: '입력 오류',
+        text2: '닉네임을 입력해주세요!',
+      });
       return;
     }
 
-    setIsLoading(true); // 👈 로딩 시작
+    setIsLoading(true);
     try {
       const response = await axios.post(
         url,
@@ -39,15 +43,28 @@ export default function LoginScreen() {
 
       if (response.data === true) {
         setNickName(trimmed);
+        Toast.show({
+          type: 'success',
+          text1: '환영합니다!',
+          text2: `${trimmed}님, 자리에 입장해주세요.`,
+        });
         navigation.navigate('SeatCheck');
       } else {
-        Alert.alert('닉네임 오류', '등록되지 않은 닉네임입니다.');
+        Toast.show({
+          type: 'error',
+          text1: '닉네임 오류',
+          text2: '등록되지 않은 닉네임입니다.',
+        });
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('서버 오류', '닉네임 확인 중 문제가 발생했습니다.');
+      Toast.show({
+        type: 'error',
+        text1: '서버 오류',
+        text2: '닉네임 확인 중 문제가 발생했습니다.',
+      });
     } finally {
-      setIsLoading(false); // 👈 로딩 종료
+      setIsLoading(false);
     }
   };
 
@@ -62,18 +79,17 @@ export default function LoginScreen() {
         value={nickname}
         onChangeText={setNickname}
         style={styles.input}
-        editable={!isLoading} // 👈 로딩 중 입력 비활성화
+        editable={!isLoading}
       />
 
       <TouchableOpacity
         style={styles.button}
         onPress={handleSubmit}
-        disabled={isLoading} // 👈 로딩 중 버튼 비활성화
+        disabled={isLoading}
       >
         <Text style={styles.buttonText}>확인</Text>
       </TouchableOpacity>
 
-      {/* 👇 로딩 오버레이 (전체 화면 터치 차단 + 인디케이터 표시) */}
       {isLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#007bff" />
@@ -116,7 +132,7 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)', // 반투명 배경
+    backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 999,

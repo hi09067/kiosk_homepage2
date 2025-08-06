@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import Toast from 'react-native-toast-message';
 import FinalScreen from './screens/FinalScreen';
 import LoginScreen from './screens/LoginScreen';
 import RoleCheckScreen from './screens/RoleCheckScreen';
@@ -21,6 +22,7 @@ export default function App() {
        <Stack.Screen name="RoleCheck" component={RoleCheckScreen} />
        <Stack.Screen name="TeamCheck" component={TeamCheckScreen} />
       </Stack.Navigator>
+       <Toast />
     </NavigationContainer>
   );
 }
