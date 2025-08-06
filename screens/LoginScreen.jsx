@@ -1,57 +1,25 @@
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import Constants from 'expo-constants';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import useUserStore from '../store/useUserStore';
-
 
 export default function LoginScreen() {
   const [nickname, setNickname] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // 👈 로딩 상태 추가
   const navigation = useNavigation();
   const { setNickName, setMemberId } = useUserStore();
-  //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
-  //const url = `${BACK_SERVER}/isDuplicateNickname`;
   const BACK_SERVER = "https://dc914c7fc766.ngrok.app";
   const url = `${BACK_SERVER}/isDuplicateNickname`;
-  console.log(url);
-  console.log("🚀 BACK_SERVER:", Constants.expoConfig.extra.BACK_SERVER);
 
-  // 임시 handleSubmit (로컬 test용)
-  const handleSubmit = async () => {
-  const trimmed = nickname.trim();
-
-  if (!trimmed) {
-    Alert.alert('입력 오류', '닉네임을 입력해주세요!');
-    return;
-  }
-
-    try {
-      const response = await axios.post(
-        url,
-        nickname,
-        {
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-
-    if (response.data === true) {
-      // 서버에서 true 반환 → 닉네임 존재
-      setNickName(trimmed);
-
-      navigation.navigate('SeatCheck');
-    } else {
-      // 서버에서 false 반환 → 닉네임 없음
-      Alert.alert('닉네임 오류', '등록되지 않은 닉네임입니다.');
-    }
-  } catch (error) {
-    console.error(error);
-    Alert.alert('서버 오류', '닉네임 확인 중 문제가 발생했습니다.');
-  }
-};
-
-
-  /*
   const handleSubmit = async () => {
     const trimmed = nickname.trim();
     if (!trimmed) {
@@ -59,29 +27,29 @@ export default function LoginScreen() {
       return;
     }
 
+    setIsLoading(true); // 👈 로딩 시작
     try {
       const response = await axios.post(
         url,
-        nickname,
+        trimmed,
         {
           headers: { 'Content-Type': 'application/json' },
         }
       );
 
       if (response.data === true) {
-        setNickName(nickname);
-        //navigate('SeatCheck'); // 다음 화면으로 이동
-        console.log("성공!")
+        setNickName(trimmed);
+        navigation.navigate('SeatCheck');
       } else {
         Alert.alert('닉네임 오류', '등록되지 않은 닉네임입니다.');
       }
     } catch (error) {
       console.error(error);
       Alert.alert('서버 오류', '닉네임 확인 중 문제가 발생했습니다.');
+    } finally {
+      setIsLoading(false); // 👈 로딩 종료
     }
   };
-  */
-
 
   return (
     <View style={styles.container}>
@@ -94,11 +62,23 @@ export default function LoginScreen() {
         value={nickname}
         onChangeText={setNickname}
         style={styles.input}
+        editable={!isLoading} // 👈 로딩 중 입력 비활성화
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleSubmit}
+        disabled={isLoading} // 👈 로딩 중 버튼 비활성화
+      >
         <Text style={styles.buttonText}>확인</Text>
       </TouchableOpacity>
+
+      {/* 👇 로딩 오버레이 (전체 화면 터치 차단 + 인디케이터 표시) */}
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#007bff" />
+        </View>
+      )}
     </View>
   );
 }
@@ -133,5 +113,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)', // 반투명 배경
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
   },
 });
