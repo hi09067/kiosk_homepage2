@@ -11,7 +11,8 @@ export default function SeatCheckScreen() {
   const [loading, setLoading] = useState(false); // 최초엔 false
   //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
   const BACK_SERVER = "https://b99d987b875f.ngrok.app";
-  const url = `${BACK_SERVER}/chkMemberSeat/${nickName}`;
+  const encodedNickName = encodeURIComponent(nickName);
+  const url = `${BACK_SERVER}/chkMemberSeat/${encodedNickName}`;
 
   const fetchSeatNumber = async () => {
     setLoading(true);
