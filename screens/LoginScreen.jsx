@@ -8,7 +8,7 @@ import useUserStore from '../store/useUserStore';
 
 export default function LoginScreen() {
   const [nickname, setNickname] = useState('');
-  const navigate = useNavigation();
+  const navigation = useNavigation();
   const { setNickName, setMemberId } = useUserStore();
   const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
   const url = `${BACK_SERVER}/isDuplicateNickname`;
@@ -35,7 +35,7 @@ export default function LoginScreen() {
       // 서버에서 true 반환 → 닉네임 존재
       setNickName(trimmed);
 
-      navigate.navigate('SeatCheck');
+      navigation.navigate('SeatCheck');
     } else {
       // 서버에서 false 반환 → 닉네임 없음
       Alert.alert('닉네임 오류', '등록되지 않은 닉네임입니다.');
