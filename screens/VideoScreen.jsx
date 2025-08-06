@@ -15,7 +15,7 @@ export default function VideoScreen() {
       <WebView
         style={{ flex: 1 }}
         javaScriptEnabled={true}
-        source={{ uri: 'https://www.youtube.com/embed/WD_jTLtTeiM' }}
+        source={{ uri: 'https://www.youtube.com/embed/Ypo9PkdTBCY' }}
         />
 
       <TouchableOpacity style={styles.button} onPress={handleNext}>
