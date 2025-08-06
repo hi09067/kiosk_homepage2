@@ -17,7 +17,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false); // 👈 로딩 상태 추가
   const navigation = useNavigation();
   const { setNickName, setMemberId } = useUserStore();
-  const BACK_SERVER = "https://dc914c7fc766.ngrok.app";
+  const BACK_SERVER = "https://b99d987b875f.ngrok.app";
   const url = `${BACK_SERVER}/isDuplicateNickname`;
 
   const handleSubmit = async () => {

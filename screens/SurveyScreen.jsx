@@ -51,7 +51,7 @@ const choiceLetters = ['a', 'b', 'c'];
 export default function SurveyScreen({ navigation }) {
   const { nickName } = useUserStore();
   //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
-   const BACK_SERVER = "https://dc914c7fc766.ngrok.app";
+   const BACK_SERVER = "https://b99d987b875f.ngrok.app";
 
   const [answers, setAnswers] = useState(Array(questions.length).fill([]));
 
