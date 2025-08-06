@@ -53,7 +53,7 @@ export default function LoginScreen() {
         Toast.show({
           type: 'error',
           text1: '닉네임 오류',
-          text2: '등록되지 않은 닉네임입니다.',
+          text2: '등록되지 않은 닉네임입니다. 다시 입력해주세요.',
         });
       }
     } catch (error) {
