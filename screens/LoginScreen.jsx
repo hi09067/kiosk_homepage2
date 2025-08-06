@@ -10,7 +10,9 @@ export default function LoginScreen() {
   const [nickname, setNickname] = useState('');
   const navigation = useNavigation();
   const { setNickName, setMemberId } = useUserStore();
-  const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
+  //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
+  //const url = `${BACK_SERVER}/isDuplicateNickname`;
+  const BACK_SERVER = "https://dc914c7fc766.ngrok.app";
   const url = `${BACK_SERVER}/isDuplicateNickname`;
   console.log(url);
   console.log("🚀 BACK_SERVER:", Constants.expoConfig.extra.BACK_SERVER);

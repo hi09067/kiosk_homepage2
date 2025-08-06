@@ -1,6 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import Constants from 'expo-constants';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Button, StyleSheet, Text, View } from 'react-native';
 import useUserStore from '../store/useUserStore';
@@ -10,7 +9,8 @@ export default function SeatCheckScreen() {
   const navigation = useNavigation();
   const [seatNumber, setSeatNumber] = useState(null);
   const [loading, setLoading] = useState(false); // 최초엔 false
-  const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
+  //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
+  const BACK_SERVER = "https://dc914c7fc766.ngrok.app";
   const url = `${BACK_SERVER}/chkMemberSeat/${nickName}`;
 
   const fetchSeatNumber = async () => {

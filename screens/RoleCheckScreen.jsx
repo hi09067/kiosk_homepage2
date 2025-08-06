@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Constants from 'expo-constants';
 import React, { useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import useUserStore from '../store/useUserStore';
@@ -7,7 +6,8 @@ import useUserStore from '../store/useUserStore';
 export default function RoleCheckScreen({ navigation }) {
   const { nickName } = useUserStore();
   console.log("닉네임 :", nickName);
-  const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
+  //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
+  const BACK_SERVER = "https://dc914c7fc766.ngrok.app";
   const [role, setRole] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [loading, setLoading] = useState(false);

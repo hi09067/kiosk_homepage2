@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Constants from 'expo-constants';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import useUserStore from '../store/useUserStore';
@@ -51,7 +50,8 @@ const choiceLetters = ['a', 'b', 'c'];
 
 export default function SurveyScreen({ navigation }) {
   const { nickName } = useUserStore();
-  const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
+  //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
+   const BACK_SERVER = "https://dc914c7fc766.ngrok.app";
 
   const [answers, setAnswers] = useState(Array(questions.length).fill([]));
 
