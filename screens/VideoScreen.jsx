@@ -1,4 +1,6 @@
-import { StyleSheet, View } from 'react-native';
+import React from 'react';
+import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 export default function VideoScreen({ navigation }) {
   const handleNext = () => {
