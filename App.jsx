@@ -8,6 +8,7 @@ import RoleCheckScreen from './screens/RoleCheckScreen';
 import SeatCheckScreen from './screens/SeatCheckScreen';
 import SurveyScreen from './screens/SurveyScreen';
 import TeamCheckScreen from './screens/TeamCheckScreen';
+import VideoScreen from './screens/VideoScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ export default function App() {
        <Stack.Screen name="Final" component={FinalScreen} />
        <Stack.Screen name="RoleCheck" component={RoleCheckScreen} />
        <Stack.Screen name="TeamCheck" component={TeamCheckScreen} />
+       <Stack.Screen name="Video" component={VideoScreen} />
       </Stack.Navigator>
        <Toast />
     </NavigationContainer>

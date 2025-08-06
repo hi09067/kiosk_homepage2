@@ -48,7 +48,7 @@ export default function LoginScreen() {
           text1: '환영합니다!',
           text2: `${trimmed}님, 자리에 입장해주세요.`,
         });
-        navigation.navigate('SeatCheck');
+        navigation.navigate('Video');
       } else {
         Toast.show({
           type: 'error',
