@@ -1,14 +1,21 @@
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useState } from 'react';
-import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native';
-import Toast from 'react-native-toast-message'; // ✅ Toast import 추가
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import Toast from 'react-native-toast-message';
 import useUserStore from '../store/useUserStore';
 
 export default function SeatCheckScreen() {
   const { nickName } = useUserStore();
   const navigation = useNavigation();
-  const [seatNumber, setSeatNumber] = useState(null);
+
+  const [seatNumber, setSeatNumber] = useState(-1); // ✅ -1: 아직 확인 안 함
   const [loading, setLoading] = useState(false);
 
   const BACK_SERVER = "https://b99d987b875f.ngrok.app";
@@ -32,7 +39,7 @@ export default function SeatCheckScreen() {
           text2: `${nickName}님의 자리는 ${resData}번입니다.`,
         });
       } else if (httpStatus === 'OK' && resData === 0) {
-        setSeatNumber(null);
+        setSeatNumber(0); // ✅ 자리 없음
         Toast.show({
           type: 'info',
           text1: '자리 배치 미완료',
@@ -58,11 +65,7 @@ export default function SeatCheckScreen() {
   };
 
   const handleNext = () => {
-    if (seatNumber === null) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('Survey');
-    }
+    navigation.navigate('Survey');
   };
 
   return (
@@ -72,12 +75,20 @@ export default function SeatCheckScreen() {
           <ActivityIndicator size="large" color="#007bff" />
           <Text style={styles.text}>자리 확인 중입니다...</Text>
         </View>
-      ) : seatNumber === null ? (
+      ) : seatNumber === -1 ? (
+        // ✅ 최초 진입 → 아직 자리 확인 안 함
         <>
-          <Text style={styles.text}>ㅜㅜ. 아직 자리 배치가 완료되지 않았어요.</Text>
+          <Text style={styles.text}>버튼을 눌러 자리를 확인해주세요.</Text>
+          <Button title="자리 확인하기" onPress={fetchSeatNumber} />
+        </>
+      ) : seatNumber === 0 ? (
+        // ✅ 확인했지만 자리 없음
+        <>
+          <Text style={styles.text}>ㅜㅜ 아직 자리 배치가 완료되지 않았어요.</Text>
           <Button title="다시 확인하기" onPress={fetchSeatNumber} />
         </>
       ) : (
+        // ✅ 자리 있음
         <>
           <Text style={styles.text}>{nickName}님의 자리는 {seatNumber}번입니다.</Text>
           <Button title="확인" onPress={handleNext} />
@@ -96,6 +107,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   center: {
+    flex: 1, // ✅ 반드시 추가
     justifyContent: 'center',
     alignItems: 'center',
   },
