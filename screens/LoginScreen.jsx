@@ -17,7 +17,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const { setNickName, setMemberId } = useUserStore();
-  const BACK_SERVER = "https://b99d987b875f.ngrok.app";
+  const BACK_SERVER = "https://kioskaws.ngrok.app";
   const url = `${BACK_SERVER}/isDuplicateNickname`;
 
   const handleSubmit = async () => {

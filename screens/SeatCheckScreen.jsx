@@ -18,7 +18,7 @@ export default function SeatCheckScreen() {
   const [seatNumber, setSeatNumber] = useState(-1); // ✅ -1: 아직 확인 안 함
   const [loading, setLoading] = useState(false);
 
-  const BACK_SERVER = "https://b99d987b875f.ngrok.app";
+  const BACK_SERVER = "https://kioskaws.ngrok.app";
   const encodedNickName = encodeURIComponent(nickName);
   const url = `${BACK_SERVER}/chkMemberSeat/${encodedNickName}`;
 

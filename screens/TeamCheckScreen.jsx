@@ -12,7 +12,7 @@ import useUserStore from '../store/useUserStore';
 export default function TeamCheckScreen({ navigation }) {
   const { nickName } = useUserStore();
   //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
-  const BACK_SERVER = "https://b99d987b875f.ngrok.app";
+  const BACK_SERVER = "https://kioskaws.ngrok.app";
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null); // ✅ 상태 메시지 저장
 

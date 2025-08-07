@@ -7,7 +7,7 @@ export default function RoleCheckScreen({ navigation }) {
   const { nickName } = useUserStore();
   console.log("닉네임 :", nickName);
   //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
-  const BACK_SERVER = "https://b99d987b875f.ngrok.app";
+  const BACK_SERVER = "https://kioskaws.ngrok.app";
   const [role, setRole] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [loading, setLoading] = useState(false);
