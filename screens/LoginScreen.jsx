@@ -133,10 +133,6 @@ export default function LoginScreen() {
               <Text style={styles.cautionText}>
                 주의! 초대장에 적혀 있는 '닉네임'을 입력해주세요
               </Text>
-
-              <Text style={styles.helperText}>
-                영수증의 닉네임과 동일하게 입력해주세요
-              </Text>
             </View>
           </View>
 
