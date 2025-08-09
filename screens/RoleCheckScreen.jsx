@@ -26,7 +26,7 @@ export default function RoleCheckScreen({ navigation }) {
       const response = await axios.get(`${BACK_SERVER}/getTeam/${nickName}`);
       const r = response.data?.resData?.role;
 
-      if (typeof r === 'string' && r.trim() !== '') {
+      if (r && r.trim() !== '') {
         setRole(r);
         setStatusMessage(`🎭 [${nickName}]님의 역할은 [${r}]입니다!`);
       } else {
