@@ -34,7 +34,7 @@ export default function VideoScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Video
-        source={require('../assets/myvideo.mp4')}
+        source={require('../assets/video/video.mp4')}
         style={{ width: videoWidth, height: videoHeight, alignSelf: 'center' }}
         resizeMode="cover"
         controls
