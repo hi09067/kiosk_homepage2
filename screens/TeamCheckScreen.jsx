@@ -2,6 +2,8 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,23 +13,18 @@ import useUserStore from '../store/useUserStore';
 
 export default function TeamCheckScreen({ navigation }) {
   const { nickName } = useUserStore();
-  //const BACK_SERVER = Constants.expoConfig.extra.BACK_SERVER;
-  const BACK_SERVER = "https://kioskaws.ngrok.app";
+  const BACK_SERVER = 'https://kioskaws.ngrok.app';
+
   const [loading, setLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState(null); // ✅ 상태 메시지 저장
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const handleCheckTeam = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${BACK_SERVER}/getTeam/${nickName}`);
-
-      const res = response.data; // 전체 ResponseDTO
+      const res = response.data; // ResponseDTO
       const receiptInfo = res?.resData;
       const team = receiptInfo?.team;
-
-      console.log('📍 TeamCheckScreen 실행');
-      console.log('receiptInfo:', receiptInfo);
-      console.log('team:', team);
 
       if (typeof team === 'string' && team.trim() !== '') {
         setStatusMessage(`[${nickName}]님은 [${team}]팀에 배정되었습니다.`);
@@ -40,7 +37,6 @@ export default function TeamCheckScreen({ navigation }) {
     } finally {
       setLoading(false);
     }
-
   };
 
   const handleConfirm = () => {
@@ -51,29 +47,49 @@ export default function TeamCheckScreen({ navigation }) {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>팀 확인하기</Text>
+  const messageStyle =
+    statusMessage?.includes('배정중')
+      ? styles.msgInfo
+      : statusMessage?.startsWith('에러')
+      ? styles.msgError
+      : styles.msgSuccess;
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#007bff" />
-      ) : statusMessage ? (
-        <>
-          <Text style={styles.message}>{statusMessage}</Text>
-          <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-            <Text style={styles.buttonText}>확인</Text>
+  return (
+    <SafeAreaView style={styles.page}>
+      <StatusBar barStyle="light-content" />
+
+      {/* 배경 블롭 (터치 방해 X) */}
+      <View style={styles.bgBlobOne} pointerEvents="none" />
+      <View style={styles.bgBlobTwo} pointerEvents="none" />
+
+      {/* 카드 */}
+      <View style={styles.card}>
+        <Text style={styles.title}>팀 확인하기</Text>
+
+        {loading ? (
+          <View style={{ paddingVertical: 12, alignItems: 'center' }}>
+            <ActivityIndicator size="large" />
+            <Text style={styles.waitText}>확인 중…</Text>
+          </View>
+        ) : statusMessage ? (
+          <>
+            <Text style={[styles.message, messageStyle]}>{statusMessage}</Text>
+            <TouchableOpacity style={styles.button} onPress={handleConfirm} activeOpacity={0.9}>
+              <Text style={styles.buttonText}>확인</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleCheckTeam} activeOpacity={0.9}>
+            <Text style={styles.buttonText}>팀 확인하기</Text>
           </TouchableOpacity>
-        </>
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={handleCheckTeam}>
-          <Text style={styles.buttonText}>팀 확인하기</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  // PAGE (다크 톤)
   page: {
     flex: 1,
     backgroundColor: '#0b1220',
@@ -81,6 +97,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  // BACKGROUND BLOBS
   bgBlobOne: {
     position: 'absolute',
     top: -120,
@@ -89,7 +106,7 @@ const styles = StyleSheet.create({
     height: 320,
     borderRadius: 200,
     backgroundColor: 'rgba(91, 140, 255, 0.35)',
-    // @ts-ignore
+    // @ts-ignore (웹 전용)
     filter: 'blur(30px)',
     opacity: 0.6,
   },
@@ -101,10 +118,12 @@ const styles = StyleSheet.create({
     height: 360,
     borderRadius: 220,
     backgroundColor: 'rgba(91, 140, 255, 0.22)',
-    // @ts-ignore
+    // @ts-ignore (웹 전용)
     filter: 'blur(28px)',
     opacity: 0.7,
   },
+
+  // CARD (글래스)
   card: {
     width: '100%',
     maxWidth: 420,
@@ -120,6 +139,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 8,
   },
+
+  // TEXTS
   title: {
     fontSize: 24,
     fontWeight: '800',
@@ -127,13 +148,23 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: 'center',
   },
+  waitText: {
+    marginTop: 10,
+    color: '#e5e7eb',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   message: {
     fontSize: 16,
-    color: '#e5e7eb',
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 22,
   },
+  msgSuccess: { color: '#e5fff5' },
+  msgInfo: { color: '#cbd5e1' },
+  msgError: { color: '#ffd4d4' },
+
+  // BUTTON
   button: {
     height: 48,
     borderRadius: 14,
@@ -146,11 +177,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
     paddingHorizontal: 28,
+    alignSelf: 'stretch',
     marginTop: 8,
-  },
-  buttonDisabled: {
-    backgroundColor: '#3a4b6a',
-    shadowOpacity: 0,
   },
   buttonText: {
     color: '#fff',
