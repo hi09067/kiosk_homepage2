@@ -6,14 +6,14 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import useUserStore from '../store/useUserStore';
@@ -64,7 +64,7 @@ export default function LoginScreen() {
     <SafeAreaView style={styles.page}>
       <StatusBar barStyle={'light-content'} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss}>
+        <TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
           {/* BACKGROUND DECOR */}
           <View style={styles.bgBlobOne} />
           <View style={styles.bgBlobTwo} />
@@ -116,7 +116,7 @@ export default function LoginScreen() {
               <Text style={styles.loadingText}>확인 중…</Text>
             </View>
           )}
-        </Pressable>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
