@@ -26,7 +26,7 @@ export default function TeamCheckScreen({ navigation }) {
       const receiptInfo = res?.resData;
       const team = receiptInfo?.team;
 
-      if (typeof team === 'string' && team.trim() !== '') {
+      if (team && team.trim() !== '') { // string 인식 못하는 오류
         setStatusMessage(`[${nickName}]님은 [${team}]팀에 배정되었습니다.`);
       } else {
         setStatusMessage('팀 배정중입니다. 조금만 기다려주세요!');
