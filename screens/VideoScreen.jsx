@@ -20,7 +20,7 @@ export default function VideoScreen({ navigation }) {
           controls
           style={styles.video}
         >
-          <source src="assets/video/video.mp4" type="video/mp4" />
+          <source src="/video/video.mp4" type="video/mp4" />
         </video>
 
         <TouchableOpacity style={styles.button} onPress={handleNext}>
@@ -34,7 +34,7 @@ export default function VideoScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Video
-        source={require('../assets/video/video.mp4')}
+        ssource={require('../assets/video/video.mp4')}
         style={{ width: videoWidth, height: videoHeight, alignSelf: 'center' }}
         resizeMode="cover"
         controls
