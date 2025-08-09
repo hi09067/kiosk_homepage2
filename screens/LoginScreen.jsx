@@ -6,13 +6,13 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -86,64 +86,68 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
-        {/* 꼭 '하나'의 자식만 두기 위해 View로 감싸줌 */}
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-          <View style={{ flex: 1 }}>
-            {/* BACKGROUND DECOR */}
-            <View style={styles.bgBlobOne} />
-            <View style={styles.bgBlobTwo} />
+        <View style={{ flex: 1 }} pointerEvents="box-none">
+          {/* BACKGROUND DECOR (터치 방해 X) */}
+          <View style={styles.bgBlobOne} pointerEvents="none" />
+          <View style={styles.bgBlobTwo} pointerEvents="none" />
 
-            {/* CENTER CARD */}
-            <View style={styles.centerWrap}>
-              <View style={styles.card}>
-                <Text style={styles.heading}>안녕하세요 👋</Text>
-                <Text style={styles.subheading}>닉네임을 입력하고 계속 진행하세요</Text>
+          {/* 배경만 탭하면 키보드 닫힘 (카드 위는 영향 없음) */}
+          <Pressable
+            onPress={Keyboard.dismiss}
+            style={StyleSheet.absoluteFill}
+            pointerEvents="box-only"
+          />
 
-                <TextInput
-                  placeholder="닉네임 입력"
-                  value={nickname}
-                  onChangeText={setNickname}
-                  style={styles.input}
-                  placeholderTextColor="#9aa4b2"
-                  editable={!isLoading}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  onSubmitEditing={handleSubmit}
-                  returnKeyType="done"
-                />
+          {/* CENTER CARD */}
+          <View style={styles.centerWrap} pointerEvents="box-none">
+            <View style={styles.card} pointerEvents="auto">
+              <Text style={styles.heading}>안녕하세요 👋</Text>
+              <Text style={styles.subheading}>닉네임을 입력하고 계속 진행하세요</Text>
 
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  style={[styles.button, disabled && styles.buttonDisabled]}
-                  onPress={handleSubmit}
-                  disabled={disabled}
-                >
-                  {isLoading ? (
-                    <ActivityIndicator size="small" />
-                  ) : (
-                    <Text style={styles.buttonText}>확인</Text>
-                  )}
-                </TouchableOpacity>
+              <TextInput
+                placeholder="닉네임 입력"
+                value={nickname}
+                onChangeText={setNickname}
+                style={styles.input}
+                placeholderTextColor="#9aa4b2"
+                editable={!isLoading}
+                autoCapitalize="none"
+                autoCorrect={false}
+                onSubmitEditing={!isLoading ? handleSubmit : undefined}
+                returnKeyType="done"
+              />
 
-                <Text style={styles.cautionText}>
-                  주의! 초대장에 적혀 있는 '닉네임'을 입력해주세요
-                </Text>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                style={[styles.button, disabled && styles.buttonDisabled]}
+                onPress={handleSubmit}
+                disabled={disabled}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size="small" />
+                ) : (
+                  <Text style={styles.buttonText}>확인</Text>
+                )}
+              </TouchableOpacity>
 
-                <Text style={styles.helperText}>
-                  영수증의 닉네임과 동일하게 입력해주세요
-                </Text>
-              </View>
+              <Text style={styles.cautionText}>
+                주의! 초대장에 적혀 있는 '닉네임'을 입력해주세요
+              </Text>
+
+              <Text style={styles.helperText}>
+                영수증의 닉네임과 동일하게 입력해주세요
+              </Text>
             </View>
-
-            {/* LOADING OVERLAY */}
-            {isLoading && (
-              <View style={styles.loadingOverlay} pointerEvents="auto">
-                <ActivityIndicator size="large" />
-                <Text style={styles.loadingText}>확인 중…</Text>
-              </View>
-            )}
           </View>
-        </TouchableWithoutFeedback>
+
+          {/* LOADING OVERLAY */}
+          {isLoading && (
+            <View style={styles.loadingOverlay} pointerEvents="auto">
+              <ActivityIndicator size="large" />
+              <Text style={styles.loadingText}>확인 중…</Text>
+            </View>
+          )}
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -163,7 +167,9 @@ const styles = StyleSheet.create({
     height: 320,
     borderRadius: 200,
     backgroundColor: 'rgba(91, 140, 255, 0.35)',
-    filter: 'blur(30px)', // web only; ignored on native
+    // filter는 웹 전용: 네이티브에선 무시됨
+    // @ts-ignore
+    filter: 'blur(30px)',
     opacity: 0.6,
   },
   bgBlobTwo: {
@@ -174,7 +180,8 @@ const styles = StyleSheet.create({
     height: 360,
     borderRadius: 220,
     backgroundColor: 'rgba(91, 140, 255, 0.22)',
-    filter: 'blur(28px)', // web only; ignored on native
+    // @ts-ignore
+    filter: 'blur(28px)',
     opacity: 0.7,
   },
 
@@ -221,7 +228,7 @@ const styles = StyleSheet.create({
   cautionText: {
     marginTop: 10,
     fontSize: 12,
-    color: '#ff6b6b', // 강조
+    color: '#ff6b6b',
     fontWeight: '700',
     textAlign: 'center',
   },
