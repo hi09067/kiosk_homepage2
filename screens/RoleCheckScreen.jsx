@@ -70,22 +70,25 @@ export default function RoleCheckScreen({ navigation }) {
             <ActivityIndicator size="large" />
             <Text style={styles.waitText}>확인 중…</Text>
           </View>
-        ) : (
-          <>
-            {statusMessage ? (
-              <>
-                <Text style={[styles.message, messageStyle]}>{statusMessage}</Text>
-                <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-                  <Text style={styles.buttonText}>확인</Text>
+          ) : (
+            <>
+              {statusMessage ? (
+                <>
+                  <Text style={[styles.message, messageStyle]}>{statusMessage}</Text>
+                  {/* 닉네임 + 역할 모두 있을 때 버튼 숨김 */}
+                  {!(nickName && role) && (
+                    <TouchableOpacity style={styles.button} onPress={handleConfirm}>
+                      <Text style={styles.buttonText}>확인</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              ) : (
+                <TouchableOpacity style={styles.button} onPress={handleCheckRole}>
+                  <Text style={styles.buttonText}>확인하기</Text>
                 </TouchableOpacity>
-              </>
-            ) : (
-              <TouchableOpacity style={styles.button} onPress={handleCheckRole}>
-                <Text style={styles.buttonText}>확인하기</Text>
-              </TouchableOpacity>
-            )}
-          </>
-        )}
+              )}
+            </>
+          )}
       </View>
     </SafeAreaView>
   );
