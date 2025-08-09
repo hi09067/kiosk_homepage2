@@ -15,7 +15,7 @@ export default function RoleCheckScreen({ navigation }) {
   const { nickName } = useUserStore();
   const BACK_SERVER = 'https://kioskaws.ngrok.app';
 
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState(null);           // ✅ 타입 제거
   const [statusMessage, setStatusMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -23,12 +23,12 @@ export default function RoleCheckScreen({ navigation }) {
     setLoading(true);
     setStatusMessage('');
     try {
-      const response = await axios.get(`${BACK_SERVER}/getTeam/${nickName}`);
-      const r = response.data?.resData?.role;
+      const response = await axios.get(BACK_SERVER + '/getTeam/' + nickName); // ✅ 백틱 X
+      const r = response.data && response.data.resData && response.data.resData.role;
 
-      if (r && r.trim() !== '') {
+      if (typeof r === 'string' && r.trim() !== '') {
         setRole(r);
-        setStatusMessage(`🎭 [${nickName}]님의 역할은 [${r}]입니다!`);
+        setStatusMessage('🎭 [' + nickName + ']님의 역할은 [' + r + ']입니다!');
       } else {
         setRole(null);
         setStatusMessage('직업 배정중입니다. 조금만 기다려주세요.');
@@ -48,9 +48,9 @@ export default function RoleCheckScreen({ navigation }) {
   };
 
   const messageStyle =
-    statusMessage.startsWith('🎭')
+    statusMessage.indexOf('🎭') === 0
       ? styles.msgSuccess
-      : statusMessage.startsWith('에러')
+      : statusMessage.indexOf('에러') === 0
       ? styles.msgError
       : styles.msgInfo;
 
@@ -58,7 +58,7 @@ export default function RoleCheckScreen({ navigation }) {
     <SafeAreaView style={styles.page}>
       <StatusBar barStyle="light-content" />
 
-      {/* 배경 데코 */}
+      {/* 배경 블롭 */}
       <View style={styles.bgBlobOne} pointerEvents="none" />
       <View style={styles.bgBlobTwo} pointerEvents="none" />
 
@@ -81,7 +81,7 @@ export default function RoleCheckScreen({ navigation }) {
               </>
             ) : (
               <TouchableOpacity style={styles.button} onPress={handleCheckRole}>
-                <Text style={styles.buttonText}>직업 확인하기</Text>
+                <Text style={styles.buttonText}>확인하기</Text>
               </TouchableOpacity>
             )}
           </>
@@ -92,7 +92,6 @@ export default function RoleCheckScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  // PAGE (다크 톤)
   page: {
     flex: 1,
     backgroundColor: '#0b1220',
@@ -108,7 +107,8 @@ const styles = StyleSheet.create({
     height: 320,
     borderRadius: 200,
     backgroundColor: 'rgba(91, 140, 255, 0.35)',
-    // @ts-ignore (웹 전용)
+    // 웹 전용 블러(네이티브에선 무시)
+    // @ts-ignore (남아있어도 주석이라 무해하지만, 지워도 됩니다)
     filter: 'blur(30px)',
     opacity: 0.6,
   },
@@ -120,12 +120,10 @@ const styles = StyleSheet.create({
     height: 360,
     borderRadius: 220,
     backgroundColor: 'rgba(91, 140, 255, 0.22)',
-    // @ts-ignore (웹 전용)
+    // @ts-ignore
     filter: 'blur(28px)',
     opacity: 0.7,
   },
-
-  // CARD (글래스)
   card: {
     width: '100%',
     maxWidth: 420,
@@ -141,8 +139,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 8,
   },
-
-  // TEXTS
   title: {
     fontSize: 24,
     fontWeight: '800',
@@ -165,8 +161,6 @@ const styles = StyleSheet.create({
   msgSuccess: { color: '#e5fff5' },
   msgInfo: { color: '#cbd5e1' },
   msgError: { color: '#ffd4d4' },
-
-  // BUTTON
   button: {
     height: 48,
     borderRadius: 14,
