@@ -2,16 +2,13 @@ import axios from 'axios';
 import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import useUserStore from '../store/useUserStore';
@@ -60,42 +57,50 @@ const questions = [
 ];
 
 const choiceLetters = ['a', 'b', 'c'];
+const letterColors = { a: '#ef4444', b: '#22c55e', c: '#3b82f6' }; // red, green, blue
 
 export default function SurveyScreen({ navigation }) {
   const { nickName } = useUserStore();
   const BACK_SERVER = 'https://kioskaws.ngrok.app';
 
+  // 각 문항별 선택(순서 반영) 저장: [ ['a','b','c'], ['b','a','c'], ... ]
   const [answers, setAnswers] = useState(Array(questions.length).fill([]));
-  const [isLoading, setIsLoading] = useState(false);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSelect = (questionIdx, choiceIdx) => {
+  const currentQuestion = questions[currentIdx];
+  const readyForNext = useMemo(() => answers[currentIdx].length === 3, [answers, currentIdx]);
+
+  const handleSelect = (choiceIdx) => {
+    const letter = choiceLetters[choiceIdx];
     setAnswers(prev => {
       const updated = [...prev];
-      const current = updated[questionIdx];
-      const letter = choiceLetters[choiceIdx];
-
-      if (current.includes(letter)) {
-        updated[questionIdx] = current.filter(c => c !== letter);
-      } else if (current.length < 3) {
-        updated[questionIdx] = [...current, letter];
+      const cur = updated[currentIdx];
+      if (cur.includes(letter)) {
+        updated[currentIdx] = cur.filter(l => l !== letter);
+      } else if (cur.length < 3) {
+        updated[currentIdx] = [...cur, letter];
       }
       return updated;
     });
   };
 
-  const readyToSubmit = useMemo(() => answers.every(a => a.length === 3), [answers]);
+  const goNext = async () => {
+    if (!readyForNext) return;
+    // 마지막 문항이면 제출
+    if (currentIdx === questions.length - 1) {
+      await handleSubmit();
+    } else {
+      setCurrentIdx(currentIdx + 1);
+    }
+  };
+
+  const goPrev = () => {
+    if (currentIdx > 0) setCurrentIdx(currentIdx - 1);
+  };
 
   const handleSubmit = async () => {
-    if (!readyToSubmit) {
-      Toast.show({
-        type: 'info',
-        text1: '설문 미완료',
-        text2: '모든 문항에서 a, b, c를 모두 선택해 주세요.',
-      });
-      return;
-    }
-
-    // 점수 계산
+    // 점수 계산 (순서 가중치: 1등=5, 2등=3, 3등=1)
     const scoreMap = { 0: 5, 1: 3, 2: 1 };
     const totals = { a: 0, b: 0, c: 0 };
     answers.forEach(answer => {
@@ -105,15 +110,15 @@ export default function SurveyScreen({ navigation }) {
     });
 
     try {
-      setIsLoading(true);
-      const res = await axios.post(`${BACK_SERVER}/submitSurvey`, {
+      setIsSubmitting(true);
+      const response = await axios.post(BACK_SERVER + '/submitSurvey', {
         nickName,
         answerA: totals['a'],
         answerB: totals['b'],
         answerC: totals['c'],
       });
 
-      const { httpStatus, message, alertType, resData } = res.data;
+      const { httpStatus, message, alertType, resData } = response.data;
       if (httpStatus === 'OK' && resData === true) {
         Toast.show({ type: 'success', text1: '제출 완료', text2: message || '감사합니다.' });
         navigation.navigate('Final');
@@ -122,7 +127,7 @@ export default function SurveyScreen({ navigation }) {
       }
     } catch (error) {
       const status = error.response?.status;
-      const { httpStatus, message, alertType } = error.response?.data || {};
+      const { message, alertType } = error.response?.data || {};
       if (status === 409) {
         Toast.show({
           type: alertType || 'info',
@@ -134,94 +139,114 @@ export default function SurveyScreen({ navigation }) {
         Toast.show({ type: 'error', text1: '서버 오류', text2: '서버에 연결할 수 없습니다.' });
       }
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
     <SafeAreaView style={styles.page}>
       <StatusBar barStyle="light-content" />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <View style={{ flex: 1 }} pointerEvents="box-none">
-          {/* 배경 데코 (터치 방해 없음) */}
-          <View style={styles.bgBlobOne} pointerEvents="none" />
-          <View style={styles.bgBlobTwo} pointerEvents="none" />
+      {/* 배경 블롭 */}
+      <View style={styles.bgBlobOne} pointerEvents="none" />
+      <View style={styles.bgBlobTwo} pointerEvents="none" />
 
-          {/* 본문 */}
-          <ScrollView contentContainerStyle={styles.scrollBody}>
-            <View style={styles.headerWrap}>
-              <Text style={styles.title}>버뮤다 키오스크 지대 🚨</Text>
-              <Text style={styles.subtitle}>각 문항에서 A·B·C를 모두 선택하세요 (순서 반영)</Text>
-            </View>
+      {/* 카드 */}
+      <View style={styles.card}>
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>버뮤다 키오스크 지대 🚨</Text>
+          <Text style={styles.progress}>Q {currentIdx + 1} / {questions.length}</Text>
+        </View>
+        <Text style={styles.subtitle}>각 문항에서 A·B·C를 모두 선택하세요 (순서 반영)</Text>
 
-            {/* 질문 카드 */}
-            <View style={styles.card}>
-              {questions.map((item, qIdx) => (
-                <View key={qIdx} style={styles.questionBlock}>
-                  <Text style={styles.question}>{item.question}</Text>
+        {/* 현재 문항 */}
+        <View style={styles.block}>
+          <Text style={styles.question}>{currentQuestion.question}</Text>
 
-                  {item.options.map((option, oIdx) => {
-                    const letter = choiceLetters[oIdx];
-                    const isSelected = answers[qIdx].includes(letter);
+          {currentQuestion.options.map((option, oIdx) => {
+            const letter = choiceLetters[oIdx];
+            const isSelected = answers[currentIdx].includes(letter);
+            const selColor = letterColors[letter];
 
-                    return (
-                      <Pressable
-                        key={oIdx}
-                        onPress={() => handleSelect(qIdx, oIdx)}
-                        style={[
-                          styles.choiceRow,
-                          isSelected && styles.choiceRowSelected,
-                        ]}
-                      >
-                        <View style={[styles.badge, isSelected && styles.badgeSelected]}>
-                          <Text style={[styles.badgeText, isSelected && styles.badgeTextSelected]}>
-                            {letter.toUpperCase()}
-                          </Text>
-                        </View>
-                        <Text style={[styles.choiceText, isSelected && styles.choiceTextSelected]}>
-                          {option}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-
-                  {/* 선택 카운터 */}
-                  <Text style={styles.pickHint}>
-                    선택: <Text style={{ color: '#e2e8f0' }}>{answers[qIdx].length}</Text>/3
-                  </Text>
-
-                  {/* 구분선 */}
-                  {qIdx !== questions.length - 1 && <View style={styles.divider} />}
-                </View>
-              ))}
-
-              {/* 제출 버튼 */}
-              <TouchableOpacity
-                activeOpacity={0.9}
-                onPress={handleSubmit}
-                disabled={!readyToSubmit || isLoading}
+            return (
+              <Pressable
+                key={oIdx}
+                onPress={() => handleSelect(oIdx)}
                 style={[
-                  styles.submitButton,
-                  (!readyToSubmit || isLoading) && styles.submitButtonDisabled,
+                  styles.choiceRow,
+                  isSelected && { backgroundColor: selColor, borderColor: 'transparent', shadowColor: selColor },
                 ]}
               >
-                {isLoading ? <ActivityIndicator size="small" /> : <Text style={styles.submitText}>확인</Text>}
-              </TouchableOpacity>
+                <View style={[
+                  styles.badge,
+                  isSelected && { backgroundColor: 'rgba(255,255,255,0.18)', borderColor: 'transparent' }
+                ]}>
+                  <Text style={[
+                    styles.badgeText,
+                    isSelected && { color: '#fff' }
+                  ]}>
+                    {letter.toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={[
+                  styles.choiceText,
+                  isSelected && { color: '#fff', fontWeight: '600' }
+                ]}>
+                  {option}
+                </Text>
+              </Pressable>
+            );
+          })}
 
-              <Text style={styles.helperText}>모든 문항에서 A·B·C를 각각 한 번씩 선택해야 합니다</Text>
-            </View>
-          </ScrollView>
+          <Text style={styles.pickHint}>
+            선택: <Text style={{ color: '#e2e8f0' }}>{answers[currentIdx].length}</Text>/3
+          </Text>
         </View>
-      </KeyboardAvoidingView>
+
+        {/* 네비게이션 버튼 */}
+        <View style={styles.navRow}>
+          <TouchableOpacity
+            onPress={goPrev}
+            disabled={currentIdx === 0 || isSubmitting}
+            style={[
+              styles.navBtnSecondary,
+              (currentIdx === 0 || isSubmitting) && styles.disabled,
+            ]}
+            activeOpacity={0.9}
+          >
+            <Text style={styles.navBtnText}>이전</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={goNext}
+            disabled={!readyForNext || isSubmitting}
+            style={[
+              styles.navBtnPrimary,
+              (!readyForNext || isSubmitting) && styles.disabled,
+            ]}
+            activeOpacity={0.9}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.navBtnText}>
+                {currentIdx === questions.length - 1 ? '제출' : '다음'}
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
 
+/* ===== styles (다크+글래스 톤) ===== */
 const styles = StyleSheet.create({
-  // Page theme (로그인 화면과 톤 맞춤)
   page: {
     flex: 1,
     backgroundColor: '#0b1220',
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   bgBlobOne: {
     position: 'absolute',
@@ -231,7 +256,7 @@ const styles = StyleSheet.create({
     height: 320,
     borderRadius: 200,
     backgroundColor: 'rgba(91, 140, 255, 0.35)',
-    // @ts-ignore - web only
+    // @ts-ignore
     filter: 'blur(30px)',
     opacity: 0.6,
   },
@@ -243,35 +268,13 @@ const styles = StyleSheet.create({
     height: 360,
     borderRadius: 220,
     backgroundColor: 'rgba(91, 140, 255, 0.22)',
-    // @ts-ignore - web only
+    // @ts-ignore
     filter: 'blur(28px)',
     opacity: 0.7,
   },
 
-  scrollBody: {
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-  },
-
-  headerWrap: {
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  title: {
-    color: '#eef2ff',
-    fontSize: 24,
-    fontWeight: '800',
-  },
-  subtitle: {
-    marginTop: 6,
-    color: '#9aa4b2',
-    fontSize: 13,
-  },
-
-  // Card container
   card: {
     width: '100%',
-    alignSelf: 'center',
     maxWidth: 700,
     backgroundColor: 'rgba(255,255,255,0.06)',
     borderColor: 'rgba(255,255,255,0.14)',
@@ -285,9 +288,29 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
-  // Questions
-  questionBlock: {
-    marginBottom: 18,
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  title: {
+    color: '#eef2ff',
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  progress: {
+    color: '#9aa4b2',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  subtitle: {
+    marginTop: 6,
+    color: '#9aa4b2',
+    fontSize: 12,
+  },
+
+  block: {
+    marginTop: 16,
   },
   question: {
     color: '#e5e7eb',
@@ -296,11 +319,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-  // Choice row (글래스 버튼 느낌)
   choiceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.18)',
     backgroundColor: 'rgba(15, 23, 42, 0.6)',
@@ -308,17 +329,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 12,
     marginVertical: 6,
-  },
-  choiceRowSelected: {
-    borderColor: 'transparent',
-    backgroundColor: '#5b8cff',
-    shadowColor: '#5b8cff',
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+    elevation: 3,
   },
-
   badge: {
     width: 28,
     height: 28,
@@ -328,28 +343,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(148,163,184,0.15)',
-  },
-  badgeSelected: {
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderColor: 'transparent',
+    marginRight: 10,
   },
   badgeText: {
     color: '#cbd5e1',
     fontWeight: '800',
     fontSize: 12,
   },
-  badgeTextSelected: {
-    color: '#fff',
-  },
-
   choiceText: {
     flex: 1,
     color: '#cbd5e1',
     fontSize: 14,
-  },
-  choiceTextSelected: {
-    color: '#fff',
-    fontWeight: '600',
   },
 
   pickHint: {
@@ -358,16 +362,13 @@ const styles = StyleSheet.create({
     color: '#9aa4b2',
   },
 
-  divider: {
+  navRow: {
     marginTop: 14,
-    marginBottom: 8,
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    flexDirection: 'row',
+    gap: 10,
   },
-
-  // Submit
-  submitButton: {
-    marginTop: 8,
+  navBtnPrimary: {
+    flex: 1,
     height: 48,
     borderRadius: 14,
     alignItems: 'center',
@@ -379,21 +380,23 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
   },
-  submitButtonDisabled: {
-    backgroundColor: '#3a4b6a',
-    shadowOpacity: 0,
+  navBtnSecondary: {
+    width: 92,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(148,163,184,0.25)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
   },
-  submitText: {
+  navBtnText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '800',
     letterSpacing: 0.2,
   },
-
-  helperText: {
-    textAlign: 'center',
-    color: '#9aa4b2',
-    fontSize: 12,
-    marginTop: 10,
+  disabled: {
+    opacity: 0.5,
   },
 });
