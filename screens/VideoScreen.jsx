@@ -1,24 +1,27 @@
 import React from 'react';
-import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Video from 'react-native-video';
 
 export default function VideoScreen({ navigation }) {
   const handleNext = () => {
     navigation.navigate('SeatCheck');
   };
 
+  const videoWidth = 1080;
+  const videoHeight = 1920;
+
+  // Web 환경
   if (Platform.OS === 'web') {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <iframe
-          width="100%"
-          height={Dimensions.get('window').height * 0.6}
-          src="https://www.youtube.com/embed/Ypo9PkdTBCY"
-          title="YouTube video"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
+      <View style={styles.container}>
+        <video
+          width={videoWidth}
+          height={videoHeight}
+          controls
+          style={styles.video}
+        >
+          <source src="assets/video/video.mp4" type="video/mp4" />
+        </video>
 
         <TouchableOpacity style={styles.button} onPress={handleNext}>
           <Text style={styles.buttonText}>넘어가기</Text>
@@ -27,12 +30,14 @@ export default function VideoScreen({ navigation }) {
     );
   }
 
+  // 모바일 환경
   return (
     <View style={styles.container}>
-      <WebView
-        javaScriptEnabled={true}
-        source={{ uri: 'https://www.youtube.com/embed/Ypo9PkdTBCY' }}
-        style={{ flex: 1 }}
+      <Video
+        source={require('../assets/myvideo.mp4')}
+        style={{ width: videoWidth, height: videoHeight, alignSelf: 'center' }}
+        resizeMode="cover"
+        controls
       />
       <TouchableOpacity style={styles.button} onPress={handleNext}>
         <Text style={styles.buttonText}>넘어가기</Text>
@@ -41,11 +46,15 @@ export default function VideoScreen({ navigation }) {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  video: {
+    display: 'block',
   },
   button: {
     position: 'absolute',
