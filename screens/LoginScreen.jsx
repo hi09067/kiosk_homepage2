@@ -13,7 +13,7 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import useUserStore from '../store/useUserStore';
@@ -30,7 +30,11 @@ export default function LoginScreen() {
   const handleSubmit = async () => {
     const trimmed = nickname.trim();
     if (!trimmed) {
-      Toast.show({ type: 'error', text1: '입력 오류', text2: '닉네임을 입력해주세요!' });
+      Toast.show({
+        type: 'error',
+        text1: '입력 오류',
+        text2: '닉네임을 입력해주세요!',
+      });
       return;
     }
 
@@ -45,77 +49,100 @@ export default function LoginScreen() {
 
       if (response.data === true) {
         setNickName(trimmed);
-        Toast.show({ type: 'success', text1: '환영합니다!', text2: `${trimmed}님, 자리에 입장해주세요.` });
+        Toast.show({
+          type: 'success',
+          text1: '환영합니다!',
+          text2: `${trimmed}님, 자리에 입장해주세요.`,
+        });
         navigation.navigate('Video');
       } else {
-        Toast.show({ type: 'error', text1: '닉네임 오류', text2: '등록되지 않은 닉네임입니다. 영수증과 동일한 닉네임을 입력해주세요.' });
+        Toast.show({
+          type: 'error',
+          text1: '닉네임 오류',
+          text2: '등록되지 않은 닉네임입니다. 영수증과 동일한 닉네임을 입력해주세요.',
+        });
       }
     } catch (error) {
       console.error(error);
-      Toast.show({ type: 'error', text1: '서버 오류', text2: '닉네임 확인 중 문제가 발생했습니다.' });
+      Toast.show({
+        type: 'error',
+        text1: '서버 오류',
+        text2: '닉네임 확인 중 문제가 발생했습니다.',
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const disabled = useMemo(() => isLoading || nickname.trim().length === 0, [isLoading, nickname]);
+  const disabled = useMemo(
+    () => isLoading || nickname.trim().length === 0,
+    [isLoading, nickname]
+  );
 
   return (
     <SafeAreaView style={styles.page}>
-      <StatusBar barStyle={'light-content'} />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
-          {/* BACKGROUND DECOR */}
-          <View style={styles.bgBlobOne} />
-          <View style={styles.bgBlobTwo} />
+      <StatusBar barStyle="light-content" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
+        {/* 꼭 '하나'의 자식만 두기 위해 View로 감싸줌 */}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={{ flex: 1 }}>
+            {/* BACKGROUND DECOR */}
+            <View style={styles.bgBlobOne} />
+            <View style={styles.bgBlobTwo} />
 
-          {/* CENTER CARD */}
-          <View style={styles.centerWrap}>
-            <View style={styles.card}>
-              <Text style={styles.heading}>안녕하세요 👋</Text>
-              <Text style={styles.subheading}>닉네임을 입력하고 계속 진행하세요</Text>
+            {/* CENTER CARD */}
+            <View style={styles.centerWrap}>
+              <View style={styles.card}>
+                <Text style={styles.heading}>안녕하세요 👋</Text>
+                <Text style={styles.subheading}>닉네임을 입력하고 계속 진행하세요</Text>
 
-              <TextInput
-                placeholder="닉네임 입력"
-                value={nickname}
-                onChangeText={setNickname}
-                style={styles.input}
-                placeholderTextColor={'#9aa4b2'}
-                editable={!isLoading}
-                autoCapitalize="none"
-                autoCorrect={false}
-                onSubmitEditing={handleSubmit}
-                returnKeyType="done"
-              />
+                <TextInput
+                  placeholder="닉네임 입력"
+                  value={nickname}
+                  onChangeText={setNickname}
+                  style={styles.input}
+                  placeholderTextColor="#9aa4b2"
+                  editable={!isLoading}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  onSubmitEditing={handleSubmit}
+                  returnKeyType="done"
+                />
 
-              <TouchableOpacity
-                activeOpacity={0.9}
-                style={[styles.button, disabled && styles.buttonDisabled]}
-                onPress={handleSubmit}
-                disabled={disabled}
-              >
-                {isLoading ? (
-                  <ActivityIndicator size="small" />
-                ) : (
-                  <Text style={styles.buttonText}>확인</Text>
-                )}
-              </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  style={[styles.button, disabled && styles.buttonDisabled]}
+                  onPress={handleSubmit}
+                  disabled={disabled}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator size="small" />
+                  ) : (
+                    <Text style={styles.buttonText}>확인</Text>
+                  )}
+                </TouchableOpacity>
 
-              <Text style={styles.cautionText}>
-                주의! 초대장에 적혀 있는 '닉네임'을 입력해주세요
-              </Text>
+                <Text style={styles.cautionText}>
+                  주의! 초대장에 적혀 있는 '닉네임'을 입력해주세요
+                </Text>
 
-              <Text style={styles.helperText}>영수증의 닉네임과 동일하게 입력해주세요</Text>
+                <Text style={styles.helperText}>
+                  영수증의 닉네임과 동일하게 입력해주세요
+                </Text>
+              </View>
             </View>
+
+            {/* LOADING OVERLAY */}
+            {isLoading && (
+              <View style={styles.loadingOverlay} pointerEvents="auto">
+                <ActivityIndicator size="large" />
+                <Text style={styles.loadingText}>확인 중…</Text>
+              </View>
+            )}
           </View>
-
-          {/* LOADING OVERLAY */}
-          {isLoading && (
-            <View style={styles.loadingOverlay} pointerEvents="auto">
-              <ActivityIndicator size="large" />
-              <Text style={styles.loadingText}>확인 중…</Text>
-            </View>
-          )}
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -147,7 +174,7 @@ const styles = StyleSheet.create({
     height: 360,
     borderRadius: 220,
     backgroundColor: 'rgba(91, 140, 255, 0.22)',
-    filter: 'blur(28px)',
+    filter: 'blur(28px)', // web only; ignored on native
     opacity: 0.7,
   },
 
@@ -192,13 +219,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   cautionText: {
-  marginTop: 10,
-  fontSize: 12,
-  color: '#ff6b6b', // 빨간 계열로 주의 강조
-  fontWeight: '700',
-  textAlign: 'center',
-},
-
+    marginTop: 10,
+    fontSize: 12,
+    color: '#ff6b6b', // 강조
+    fontWeight: '700',
+    textAlign: 'center',
+  },
 
   // INPUT
   input: {
