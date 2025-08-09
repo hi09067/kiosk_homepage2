@@ -16,7 +16,7 @@ export default function TeamCheckScreen({ navigation }) {
   const BACK_SERVER = 'https://kioskaws.ngrok.app';
 
   const [loading, setLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState(null); // JS: 타입 표기 제거
 
   const handleCheckTeam = async () => {
     setLoading(true);
@@ -74,12 +74,20 @@ export default function TeamCheckScreen({ navigation }) {
         ) : statusMessage ? (
           <>
             <Text style={[styles.message, messageStyle]}>{statusMessage}</Text>
-            <TouchableOpacity style={styles.button} onPress={handleConfirm} activeOpacity={0.9}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleConfirm}
+              activeOpacity={0.9}
+            >
               <Text style={styles.buttonText}>확인</Text>
             </TouchableOpacity>
           </>
         ) : (
-          <TouchableOpacity style={styles.button} onPress={handleCheckTeam} activeOpacity={0.9}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleCheckTeam}
+            activeOpacity={0.9}
+          >
             <Text style={styles.buttonText}>팀 확인하기</Text>
           </TouchableOpacity>
         )}
@@ -97,6 +105,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   // BACKGROUND BLOBS
   bgBlobOne: {
     position: 'absolute',
