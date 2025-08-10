@@ -63,7 +63,7 @@ export default function SurveyScreen({ navigation }) {
   const { nickName } = useUserStore();
   const BACK_SERVER = 'https://kioskaws.ngrok.app';
 
-  const [started, setStarted] = useState(false); // ← 시작 화면 제어
+  const [started, setStarted] = useState(false);
   const [answers, setAnswers] = useState(Array(questions.length).fill([]));
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,7 +79,7 @@ export default function SurveyScreen({ navigation }) {
       if (cur.includes(letter)) {
         updated[currentIdx] = cur.filter((l) => l !== letter);
       } else if (cur.length < 3) {
-        updated[currentIdx] = [...cur, letter];
+        updated[currentIdx] = [...cur, letter]; // 선택 순서 보존
       }
       return updated;
     });
@@ -141,6 +141,11 @@ export default function SurveyScreen({ navigation }) {
     }
   };
 
+  // NEW: 현재 문항의 선택 순서를 텍스트로 구성 (A-B-C)
+  const orderText = answers[currentIdx]
+    .map((l) => l.toUpperCase())
+    .join(' - ');
+
   return (
     <SafeAreaView style={styles.page}>
       <StatusBar barStyle="light-content" />
@@ -153,7 +158,7 @@ export default function SurveyScreen({ navigation }) {
         <View style={styles.card}>
           <Text style={styles.title}>버뮤다 키오스크 지대 🚨</Text>
           <Text style={styles.subtitleCenter}>
-            설문은 총 5문항입니다. 각 문항에서 A·B·C를 모두 선택하면 다음으로 넘어갑니다.
+            설문은 총 5문항입니다. 각 문항에서 불편하다고 느끼는 순서대로 A·B·C를 선택하면 다음으로 넘어갑니다.
           </Text>
           <TouchableOpacity
             style={styles.startBtn}
@@ -176,7 +181,7 @@ export default function SurveyScreen({ navigation }) {
               Q {currentIdx + 1} / {questions.length}
             </Text>
           </View>
-          <Text style={styles.subtitle}>각 문항에서 A·B·C를 모두 선택하세요 (순서 반영)</Text>
+          <Text style={styles.subtitle}>각 문항에서 불편하다고 느끼는 순서대로 A·B·C를 모두 선택하세요 (순서 반영)</Text>
 
           <View style={styles.block}>
             <Text style={styles.question}>{currentQuestion.question}</Text>
@@ -218,6 +223,13 @@ export default function SurveyScreen({ navigation }) {
 
             <Text style={styles.pickHint}>
               선택: <Text style={{ color: '#e2e8f0' }}>{answers[currentIdx].length}</Text>/3
+            </Text>
+          </View>
+
+          {/* NEW: 선택 순서 표시 (제출/다음 버튼 윗줄) */}
+          <View style={styles.orderRow}>
+            <Text style={styles.orderText}>
+              선택 순서 : {orderText || '-'}
             </Text>
           </View>
 
@@ -301,7 +313,6 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
-  // 시작 화면 전용
   subtitleCenter: {
     marginTop: 6,
     color: '#9aa4b2',
@@ -324,7 +335,6 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
 
-  // 공통 타이틀/헤더
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -397,6 +407,17 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 12,
     color: '#9aa4b2',
+  },
+
+  // NEW: 선택 순서 라인
+  orderRow: {
+    marginTop: 10,
+    paddingVertical: 8,
+  },
+  orderText: {
+    color: '#e5e7eb',
+    fontSize: 13,
+    fontWeight: '700',
   },
 
   navRow: {

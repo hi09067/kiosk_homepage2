@@ -12,4 +12,6 @@
 -npm install react-native-dotenv => .env 사용을 위해 설치
 -npm install axios  => axios 사용을 위해 설치
 -npm install react-native-toast-message   =>alert 창 사용을 위한 설치
--npx expo install react-native-webview  => 영상 삽입을 위한 설치
+-npx expo install react-native-webview  => 유튜브 영상 삽입을 위한 설치
+
+- npm install react-native-video        => 영상 삽입 (mp4)
