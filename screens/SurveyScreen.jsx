@@ -314,6 +314,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '900',
     textAlign: 'center',
+    textAlign: 'center',
   },
 
   card: {
