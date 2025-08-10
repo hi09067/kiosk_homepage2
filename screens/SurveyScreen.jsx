@@ -154,7 +154,7 @@ export default function SurveyScreen({ navigation }) {
           {/* ✅ 경고 박스: 제목 위, 별도 컨테이너 */}
           <View style={styles.alertBox}>
             <Text style={styles.alertText}>
-              🚨 제발.. 진행자의 안내가 있을 때까지 버튼 클릭 금지!! 🚨
+              🚨 [중요] 진행자의 안내가 있을 때까지 버튼 클릭 금지!! 🚨
             </Text>
           </View>
 
