@@ -57,7 +57,7 @@ const questions = [
 ];
 
 const choiceLetters = ['a', 'b', 'c'];
-const letterColors = { a: '#ef4444', b: '#22c55e', c: '#3b82f6' }; // A=red, B=green, C=blue
+const letterColors = { a: '#ef4444', b: '#22c55e', c: '#3b82f6' };
 
 export default function SurveyScreen({ navigation }) {
   const { nickName } = useUserStore();
@@ -79,7 +79,7 @@ export default function SurveyScreen({ navigation }) {
       if (cur.includes(letter)) {
         updated[currentIdx] = cur.filter((l) => l !== letter);
       } else if (cur.length < 3) {
-        updated[currentIdx] = [...cur, letter]; // 선택 순서 보존
+        updated[currentIdx] = [...cur, letter];
       }
       return updated;
     });
@@ -141,40 +141,43 @@ export default function SurveyScreen({ navigation }) {
     }
   };
 
-  // NEW: 현재 문항의 선택 순서를 텍스트로 구성 (A-B-C)
-  const orderText = answers[currentIdx]
-    .map((l) => l.toUpperCase())
-    .join(' - ');
+  const orderText = answers[currentIdx].map((l) => l.toUpperCase()).join(' - ');
 
   return (
     <SafeAreaView style={styles.page}>
       <StatusBar barStyle="light-content" />
-      {/* 배경 블롭 */}
       <View style={styles.bgBlobOne} pointerEvents="none" />
       <View style={styles.bgBlobTwo} pointerEvents="none" />
 
-      {/* 시작 화면 */}
       {!started ? (
-        <View style={styles.card}>
-          <Text style={styles.alert}>🚨제발..진행자의 안내가 있을 때까지 버튼 클릭 금지!!🚨</Text>
-          <Text style={styles.title}>버뮤다 키오스크 지대 🚨</Text>
-          <Text style={styles.subtitleCenter}>
-            설문은 총 5문항입니다. 각 문항에서 불편하다고 느끼는 순서대로 A·B·C를 선택하면 다음으로 넘어갑니다.
-          </Text>
-          <TouchableOpacity
-            style={styles.startBtn}
-            onPress={() => {
-              setStarted(true);
-              setCurrentIdx(0);
-              setAnswers(Array(questions.length).fill([]));
-            }}
-            activeOpacity={0.9}
-          >
-            <Text style={styles.navBtnText}>설문조사 하러 가기</Text>
-          </TouchableOpacity>
-        </View>
+        <>
+          {/* ✅ 경고 박스: 제목 위, 별도 컨테이너 */}
+          <View style={styles.alertBox}>
+            <Text style={styles.alertText}>
+              🚨 제발.. 진행자의 안내가 있을 때까지 버튼 클릭 금지!! 🚨
+            </Text>
+          </View>
+
+          {/* 시작 카드 */}
+          <View style={styles.card}>
+            <Text style={styles.title}>버뮤다 키오스크 지대 🚨</Text>
+            <Text style={styles.subtitleCenter}>
+              설문은 총 5문항입니다. 각 문항에서 불편하다고 느끼는 순서대로 A·B·C를 선택하면 다음으로 넘어갑니다.
+            </Text>
+            <TouchableOpacity
+              style={styles.startBtn}
+              onPress={() => {
+                setStarted(true);
+                setCurrentIdx(0);
+                setAnswers(Array(questions.length).fill([]));
+              }}
+              activeOpacity={0.9}
+            >
+              <Text style={styles.navBtnText}>설문조사 하러 가기</Text>
+            </TouchableOpacity>
+          </View>
+        </>
       ) : (
-        // 질문 화면
         <View style={styles.card}>
           <View style={styles.headerRow}>
             <Text style={styles.title}>버뮤다 키오스크 지대 🚨</Text>
@@ -227,11 +230,9 @@ export default function SurveyScreen({ navigation }) {
             </Text>
           </View>
 
-          {/* NEW: 선택 순서 표시 (제출/다음 버튼 윗줄) */}
+          {/* 선택 순서 표시 */}
           <View style={styles.orderRow}>
-            <Text style={styles.orderText}>
-              선택 순서 : {orderText || '-'}
-            </Text>
+            <Text style={styles.orderText}>선택 순서 : {orderText || '-'}</Text>
           </View>
 
           <View style={styles.navRow}>
@@ -265,7 +266,7 @@ export default function SurveyScreen({ navigation }) {
   );
 }
 
-/* ===== styles (다크+글래스 톤) ===== */
+/* ===== styles ===== */
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -282,8 +283,6 @@ const styles = StyleSheet.create({
     height: 320,
     borderRadius: 200,
     backgroundColor: 'rgba(91, 140, 255, 0.35)',
-    // @ts-ignore
-    filter: 'blur(30px)',
     opacity: 0.6,
   },
   bgBlobTwo: {
@@ -294,9 +293,27 @@ const styles = StyleSheet.create({
     height: 360,
     borderRadius: 220,
     backgroundColor: 'rgba(91, 140, 255, 0.22)',
-    // @ts-ignore
-    filter: 'blur(28px)',
     opacity: 0.7,
+  },
+
+  /* ✅ 새 경고 박스 */
+  alertBox: {
+    width: '100%',
+    maxWidth: 700,
+    backgroundColor: 'rgba(235, 13, 13, 0.10)',
+    borderColor: '#eb0d0d',
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    alignSelf: 'center',
+  },
+  alertText: {
+    color: '#ff6b6b',
+    fontSize: 16,
+    fontWeight: '900',
+    textAlign: 'center',
   },
 
   card: {
@@ -345,11 +362,6 @@ const styles = StyleSheet.create({
     color: '#eef2ff',
     fontSize: 20,
     fontWeight: '800',
-  },
-  alert: {
-    color: '#eb0d0dff',
-    fontSize: 50,
-    fontWeight: '900',
   },
   progress: {
     color: '#9aa4b2',
@@ -415,7 +427,6 @@ const styles = StyleSheet.create({
     color: '#9aa4b2',
   },
 
-  // NEW: 선택 순서 라인
   orderRow: {
     marginTop: 10,
     paddingVertical: 8,
