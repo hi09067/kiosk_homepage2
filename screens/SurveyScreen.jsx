@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   alertText: {
     color: '#ff6b6b',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '900',
     textAlign: 'center',
   },
