@@ -156,7 +156,7 @@ export default function SurveyScreen({ navigation }) {
       {/* 시작 화면 */}
       {!started ? (
         <View style={styles.card}>
-          <Text style={styles.alert}>🚨진행자의 안내가 있을 떄까지 버튼 클릭 금지🚨</Text>
+          <Text style={styles.alert}>🚨제발..진행자의 안내가 있을 때까지 버튼 클릭 금지!!🚨</Text>
           <Text style={styles.title}>버뮤다 키오스크 지대 🚨</Text>
           <Text style={styles.subtitleCenter}>
             설문은 총 5문항입니다. 각 문항에서 불편하다고 느끼는 순서대로 A·B·C를 선택하면 다음으로 넘어갑니다.
